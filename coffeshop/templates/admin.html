@@ -1,0 +1,230 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+{% load static %}
+{% load ingredients_are_available %}
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+{% endblock %}
+{% block body %}
+<style>
+    img.one {
+        height: 25%;
+        width: 25%;
+    }
+    table{
+        height: 44px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-color: #ffffff;
+        font-weight: normal;
+        color: #555555;
+        padding: 11px 0px 11px 0px;
+        padding-left: 0px;
+        vertical-align: middle;
+}
+      
+</style>
+<div class="container col-xxl-8 px-4 py-5 align-items-center">
+    <h1>Hello Admin, Here is your dashboard:</h1>
+    <br>
+    <div class="container">
+        <table>
+            <td style="padding-right: 10px;"><a class="btn btn-success" id="create-order"><i class="fa-solid fa-mug-saucer"></i><br>Add a new order</a></td>
+            <td style="padding-right: 10px;padding-left: 10px;"><a class="btn btn-success" id="create-ingredient"><i class="fa-solid fa-cubes-stacked"></i><br>Add a new ingredient</a></td>
+            <td style="padding-left: 10px;"><a class="btn btn-success" id="view-as-costumer"><i class="fa-solid fa-street-view"></i><br>View as costumer</a></td>
+        </table>
+    </div>
+    
+    <br>
+    <button type="button" class="btn btn-outline-primary switch" data-mdb-ripple-color="dark">Switch to Ingredients</button>
+    <button type="button" class="btn btn-outline-primary switch-ingredients" data-mdb-ripple-color="dark" style="display:none;">Switch to Orders</button>
+
+    <br>
+    <div class="container orders">
+        <h2>Your orders:</h2>
+        <table>
+            <tbody><tr>
+                <th style="width:25%;font-size:16px;text-align:left;">Image</th>
+                <th style="width:25%;">Name</th>
+                <th style="width:25%;">Status</th>
+                <th style="width:25%;">Availibility</th>
+                <th style="width:25%;">Options</th>
+              </tr>
+
+        {% for order in order_data %}
+        <tr>
+
+            <td style="width:25%;">
+                {% if order.order_image %}
+                    <img src="{{order.order_image.url}}" width="50" height="50" class="card-img-top one" alt={{order.name}}/>
+                {% endif %}
+            </td>
+            <td style="width:25%;">{{order.name}}</td>
+            <td style="width:25%;">
+            {% if  order.is_activated == "true"%}
+                <span class="badge rounded-pill badge-success">Available</span> 
+            {% else %}
+                <span class="badge rounded-pill badge-danger">On hold</span>
+            {% endif %}
+            </td>
+            <td style="width:25%;">
+                {% if  order|ingredients_are_available%}
+                    <span class="badge rounded-pill badge-success">Available</span> 
+                {% else %}
+                    <span class="badge rounded-pill badge-danger">Ingredients are out</span>
+                {% endif %}
+            </td>
+            <td style="width:25%;">
+                <div class="btn-group">
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                  Actions
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'edit_order' order.slug %}">Edit</a></li>
+                  <li><a class="dropdown-item" href="#">View</a></li>
+                  <li><a class="dropdown-item" href="#">Suspend</a></li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li><form data-id="{{order.slug}}" id="delete-order">{% csrf_token %}<input value="Delete" class="dropdown-item remove" type="submit"></input></form></li>
+                </ul>
+              </div>
+            </td>
+          </div>
+        </tr> 
+        {%endfor%}
+            </tbody>
+        </table>
+    </div>
+    <div class="container ingredients" style="display:none;">
+        <h2>Your ingredients:</h2>
+        <table>
+            <tbody><tr>
+                <th style="width:25%;font-size:16px;text-align:left;">Image</th>
+                <th style="width:25%;">Name</th>
+                <th style="width:25%;">Status</th>
+                <th style="width:25%;">Availibility</th>
+                <th style="width:25%;">Options</th>
+              </tr>
+
+        {% for ingredient in ingredient_data %}
+        <tr>
+
+            <td style="width:25%;">
+                {% if ingredient.ingredient_image %}
+                    <img src="{{ingredient.ingredient_image.url}}" width="50" height="50" class="card-img-top one" alt={{order.name}}/>
+                {% endif %}
+            </td>
+            <td style="width:25%;">{{ingredient.name}}</td>
+            <td style="width:25%;">
+            {% if  ingredient.is_activated == "true"%}
+                <span class="badge rounded-pill badge-success">Available</span> 
+            {% else %}
+                <span class="badge rounded-pill badge-danger">On hold</span>
+            {% endif %}
+            </td>
+            <td style="width:25%;">
+                {% if  ingredient.quantity > 5 %}
+                    <span class="badge rounded-pill badge-success">Available</span> 
+                {% else %}
+                    <span class="badge rounded-pill badge-danger">out of stock</span>
+                {% endif %}
+            </td>
+            <td style="width:25%;">
+                <div class="btn-group">
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                  Actions
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'edit_ingredient' ingredient.ingredient_slug %}">Edit</a></li>
+                  <li><a class="dropdown-item" href="#">View</a></li>
+                  <li><a class="dropdown-item" href="#">Suspend</a></li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li><a class="dropdown-item" id="delete-ingredient">Delete</a></li>
+                </ul>
+              </div>
+            </td>
+          </div>
+        </tr> 
+        {%endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+$(document).on('click', '.switch,.switch-ingredients', function(e) {
+        e.preventDefault();
+        $('.ingredients,.orders').toggle();
+        $('.switch,.switch-ingredients').toggle();
+});
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector("#create-order").addEventListener("click", () => {
+        const csrf = Cookies.get('csrftoken');
+        fetch('/order/create', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                name: "Sweet Coffee!",
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            window.location = `/order/${result.slug}/edit`
+        })
+    })
+    document.querySelector("#create-ingredient").addEventListener("click", () => {
+        const csrf = Cookies.get('csrftoken');
+        fetch('/ingredient/create', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                name: "Sweet Sugar!",
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            window.location = `/ingredient/${result.ingredient_slug}/edit`
+        })
+    })
+    document.querySelector("#view-as-costumer").addEventListener("click", () => {
+        const csrf = Cookies.get('csrftoken');
+        fetch('/ingredient/create', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                name: "Sweet Sugar!",
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            window.location = `/ingredient/${result.ingredient_slug}/edit`
+        })
+    })
+    document.querySelector("#delete-order").addEventListener("submit", e => {
+        e.preventDefault();
+        const csrf = Cookies.get('csrftoken');
+        const el = document.querySelector('#delete-order');
+        if(window.confirm("Are you sure? This action CANNOT be undone.")){
+            fetch(`order/${el.dataset.id}/delete`, {
+                method: "DELETE",
+                headers: {'X-CSRFToken': csrf}
+            })
+            .then(() => window.location = "/")
+        }
+    })
+    document.querySelector("#delete-ingredient").addEventListener("submit", e => {
+        e.preventDefault();
+        if(window.confirm("Are you sure? This action CANNOT be undone.")){
+            fetch(`ingredient/${this.dataset.id}/delete`, {
+                method: "DELETE",
+                headers: {'X-CSRFToken': csrf}
+            })
+            .then(() => window.location = "/")
+        }
+    })
+})
+</script>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{%load static %}
+{% block title %}
+Register|E-Coffee-Shop
+{% endblock %}
+{% block script %} 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class = "container">
+
+    <h1>What kind of coffee would you like?</h1>
+  
+
+     
+    <div class="row">
+        {% for order in orders_data %}
+        <div class="col-sm-3">
+            <div class="card">
+                {% if order.order_image %}
+                    <img src="{{order.order_image.url}}" class="card-img-top" alt={{order.name}}/>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{order.name}}</h5>
+                    <p class="card-text">{{order.description}}</p>
+                    <button class="btn btn-success btn-floating" id="add-to-cart" data-id="{{order.slug}}"><i class="fas fa-add"></i></button>
+                    <button type="button" class="btn btn-danger btn-floating">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector("#add-to-cart").addEventListener("click", () => {
+        e.preventDefault();
+        const csrf = Cookies.get('csrftoken');
+        const el = document.querySelector('#delete-order');
+        fetch(`cartitem/${el.dataset.id}/create`, {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf}
+        })
+        .then(() => window.location = "/")
+    })
+})
+</script>
+  {% endblock %}    

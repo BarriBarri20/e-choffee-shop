@@ -1,0 +1,33 @@
+
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{%load static %}
+{% block title %}
+Edit Order
+{% endblock %}
+{% block script %}
+
+{% endblock %}
+
+{% block body %}
+<div class="container">
+  <br>
+  <br>
+  <h1>Create an order here or modify it:</h1>
+
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <ul class="list-group list-group-light">
+    {% for field in form.visible_fields %}
+      <li class="list-group-item">
+        {{ field.label_tag }}
+        {% render_field field class="form-control" %}
+      </li>
+    {% endfor %}
+    </ul>
+    <p> Hold down “Control”, or “Command” on a Mac, to select more than one. </p>
+  <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+
+{% endblock %}

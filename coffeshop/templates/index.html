@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block title %}
+E-Coffee-Shop
+{% endblock %}
+{% load static %}
+{% block script %}
+{% endblock %}
+{% block body %}
+
+<div class="container col-xxl-8 px-4 py-5 align-items-center">
+    <h1 class="display-5 fw-bold lh-1 mb-3">Buy Coffee Online, {{ user }}</h1>
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+      <div class="col-10 col-sm-8 col-lg-6">
+        <img src="{%static 'img/coffee-love.gif'%}"  class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="400" height="300" loading="lazy">
+      </div>
+      <div class="col-lg-6">
+        <h1>With simple steps!</h1>
+        <p class = "lead">You smell coffee? This is True it's far from you just 2 clicks!
+            <ul>
+                <li>Choose your coffee type</li>
+                <li>Add what you need</li>
+                <li>Get a bill</li> 
+                <li>Sip it</li>
+            </ul>
+        </p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+          <form action="{% url 'order' %}"><button type="submit" class="btn btn-primary btn-lg px-4 me-md-2">order</button></form>
+          <button type="button" class="btn btn-outline-secondary btn-lg px-4">Default</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
